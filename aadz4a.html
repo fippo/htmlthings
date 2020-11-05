@@ -40,7 +40,7 @@ setInterval(async () => {
     stats.forEach(report => {
       if (report.type !== 'inbound-rtp') return;
       const delta = (report.totalAudioEnergy - previousStats.get(report.id).totalAudioEnergy) / (report.timestamp - previousStats.get(report.id).timestamp);
-      energySeries.addPoint(report.timestamp, delta);
+      energySeries.addPoint(report.timestamp, report.audioLevel);
       energyGraph.setDataSeries([energySeries]);
       energyGraph.updateEndDate();
     });
