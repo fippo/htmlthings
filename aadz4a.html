@@ -11,6 +11,7 @@ pc1.onicecandidate = e => pc2.addIceCandidate(e.candidate);
 pc2.onicecandidate = e => pc1.addIceCandidate(e.candidate);
 pc2.ontrack = e => {
   el.srcObject = trackFactories.audio();
+  el.play();
 };
 
 const trackFactories = {
@@ -36,7 +37,6 @@ document.getElementById('play').addEventListener('click', async () => {
   await pc1.setRemoteDescription(answer);
   await pc2.setLocalDescription(answer);
 
-  el.play();
 });
 document.getElementById('gum').addEventListener('click', async () => {
   try {
