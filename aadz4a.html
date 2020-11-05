@@ -26,14 +26,13 @@ pc2.ontrack = e => {
    document.getElementById('err').innerText += '\n' + e.toString();
   });
 
-  /*
   energySeries = new TimelineDataSeries();
   energyGraph = new TimelineGraphView('energyGraph', 'energyCanvas');
   energyGraph.updateEndDate();
-  */
+
+  document.getElementById('err').innerText += '\nontrack done';
 };
 
-/*
 let previousStats;
 setInterval(async () => {
   if (!energyGraph) return;
@@ -50,7 +49,6 @@ setInterval(async () => {
   }
   previousStats = stats;
 }, 1000);
-*/
 
 const trackFactories = {
   audioContext: null,
