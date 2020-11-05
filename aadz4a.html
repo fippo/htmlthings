@@ -12,7 +12,9 @@ pc1.onicecandidate = e => pc2.addIceCandidate(e.candidate);
 pc2.onicecandidate = e => pc1.addIceCandidate(e.candidate);
 pc2.ontrack = e => {
   el.srcObject = e.streams[0];
-  el.play();
+  el.play().catch(e => {
+   document.getElementById('err').innerText += '\n' + e.toString();
+  });
 };
 
 const trackFactories = {
@@ -28,6 +30,7 @@ const trackFactories = {
   },  
 };
 document.getElementById('play').addEventListener('click', async () => {
+  document.getElementById('err').innerText += '\nstarting';
   const stream = trackFactories.audio();
   pc1.addTrack(stream.getTracks()[0], stream);
   const offer = await pc1.createOffer();
@@ -38,17 +41,21 @@ document.getElementById('play').addEventListener('click', async () => {
   await pc1.setRemoteDescription(answer);
   await pc2.setLocalDescription(answer);
 
+  document.getElementById('err').innerText += '\establishing...';
+  pc1.oniceconnectionstatechange = () => {
+    document.getElementById('err').innerText += '\nICE ' + pc1.iceConnectionState;
+  };
 });
 document.getElementById('gum').addEventListener('click', async () => {
   try {
     await navigator.mediaDevices.getUserMedia({audio: true});
   } catch(e) {
-    document.getElementById('err').innerText = e.toString();
+    document.getElementById('err').innerText += '\n' + e.toString();
   };
 });
 
 document.getElementById('getsettings').addEventListener('click', async () => {
   const track = pc2.getReceivers()[0].track;
-  document.getElementById('err').innerText = JSON.stringify(track.getSettings(), null, ' ');
+  document.getElementById('err').innerText += '\n' + JSON.stringify(track.getSettings(), null, ' ');
 });
 </script>
