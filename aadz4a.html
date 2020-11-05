@@ -42,7 +42,7 @@ setInterval(async () => {
     stats.forEach(report => {
       if (report.type !== 'track') return;
       const delta = (report.totalAudioEnergy - previousStats.get(report.id).totalAudioEnergy) / (report.timestamp - previousStats.get(report.id).timestamp);
-      energySeries.addPoint(report.timestamp, report.audioLevel);
+      energySeries.addPoint(report.timestamp, delta);
       energyGraph.setDataSeries([energySeries]);
       energyGraph.updateEndDate();
     });
