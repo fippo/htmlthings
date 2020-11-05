@@ -1,0 +1,30 @@
+<button id="play">play noise</button>
+<audio id="audioElement"></audio>
+<button id="gum">request getusermedia (then deny)</button>
+<div id="err"></div>
+<script>
+const trackFactories = {
+  audioContext: null,
+
+  audio() {
+    const ctx = trackFactories.audioContext = trackFactories.audioContext ||
+      new (window.AudioContext ||window.webkitAudioContext)();
+    const oscillator = ctx.createOscillator();
+    const dst = oscillator.connect(ctx.createMediaStreamDestination());
+    oscillator.start();
+    return dst.stream;
+  },  
+};
+document.getElementById('play').addEventListener('click', () => {
+  const el = document.getElementById('audioElement');
+  el.srcObject = trackFactories.audio();
+  el.play();
+});
+document.getElementById('gum').addEventListener('click', async () => {
+  try {
+    await navigator.mediaDevices.getUserMedia({audio: true});
+  } catch(e) {
+    document.getElementById('err').innerText = e.toString();
+  };
+});
+</script>
