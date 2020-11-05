@@ -1,10 +1,19 @@
+<script src="https://webrtc.github.io/samples/src/js/third_party/graph.js"></script>
 <button id="play">play noise</button>
 <audio id="audioElement"></audio>
 <button id="gum">request getusermedia (then deny)</button>
 <button id="getsettings">check track settings</button>
 <div id="err"></div>
+
+<div class="graph-container" id="energyGraph">
+  <div>Energy delta</div>
+  <canvas id="energyCanvas"></canvas>
+</div>
 <script>
 const el = document.getElementById('audioElement');
+
+let energyGraph;
+let energySeries;
 
 const pc1 = new RTCPeerConnection();
 const pc2 = new RTCPeerConnection();
@@ -16,7 +25,28 @@ pc2.ontrack = e => {
   el.play().catch(e => {
    document.getElementById('err').innerText += '\n' + e.toString();
   });
+
+  energySeries = new TimelineDataSeries();
+  energyGraph = new TimelineGraphView('energyGraph', 'energyCanvas');
+  energyGraph.updateEndDate();
 };
+
+let previousStats;
+setInterval(async () => {
+  if (!energyGraph) return;
+  const receiver = pc2.getReceivers().find(r => r.track.kind === 'audio');
+  const stats = await receiver.getStats();
+  if (previousStats) {
+    stats.forEach(report => {
+      if (report.type !== 'inbound-rtp') return;
+      const delta = (report.totalAudioEnergy - previousStats.get(report.id).totalAudioEnergy) / (report.timestamp - previousStats.get(report.id).timestamp);
+      energySeries.addPoint(report.timestamp, delta);
+      energyGraph.setDataSeries([energySeries]);
+      energyGraph.updateEndDate();
+    });
+  }
+  previousStats = stats;
+}, 1000);
 
 const trackFactories = {
   audioContext: null,
