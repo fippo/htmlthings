@@ -2,7 +2,6 @@
 <button id="play">play noise</button>
 <audio id="audioElement"></audio>
 <button id="gum">request getusermedia (then deny)</button>
-<button id="getsettings">check track settings</button>
 <div id="err"></div>
 
 <div class="graph-container" id="energyGraph">
@@ -89,10 +88,5 @@ document.getElementById('gum').addEventListener('click', async () => {
   } catch(e) {
     document.getElementById('err').innerText += '\n' + e.toString();
   };
-});
-
-document.getElementById('getsettings').addEventListener('click', async () => {
-  const track = pc2.getReceivers()[0].track;
-  document.getElementById('err').innerText += '\n' + JSON.stringify(track.getSettings(), null, ' ');
 });
 </script>
